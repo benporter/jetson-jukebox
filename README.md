@@ -36,30 +36,35 @@ flowchart TD
     C --> D[whisper.cpp + CUDA<br/>ggml-base.en → transcript]
 
     D --> R{{Deterministic router<br/>keyword match — BEFORE the LLM}}
-    R -->|album, playlist| COL[resolve_collection<br/>album/playlist → container URI]
+    R -->|album, playlist| Q{{🌙 quiet-hours gate<br/>within_play_hours.sh · 05:00–22:00}}
     R -->|everything else| E[llama.cpp :8080<br/>Qwen2.5-1.5B → intent JSON]
 
     E --> F{intent type}
-    F -->|pause, resume, volume| BR
+    F -->|pause, resume, volume| BR[node-sonos-http-api :5005]
     F -->|song| Q
 
-    COL --> Q{{🌙 quiet-hours gate<br/>within_play_hours.sh · 05:00–22:00}}
-    Q -->|outside window| BLK
-    Q -->|allowed| RES[spotify_resolve.py<br/>search → track id + explicit flag]
+    Q -->|outside window| BLK[⛔ refuse · log why<br/>🗣️ Piper TTS speaks it on the Pebble]
+    Q -->|song → track| RES[spotify_resolve.py · resolve_song<br/>search → track id + explicit flag]
+    Q -->|album / playlist → container| RC[spotify_resolve.py · resolve_collection<br/>album / playlist → container URI]
+
     RES -->|HTTPS search| SPT([☁️ Spotify Web API])
+    RC -->|HTTPS search| SPT
 
     RES --> EGG{🥚 Stairway<br/>to Heaven?}
     EGG -->|yes| EC[▶️ local clip on the Pebble<br/>NOT Sonos · log 'Easter egg']
-    EGG -->|no| CG{🚫 explicit?<br/>blocklist.py · collection scan}
-    CG -->|blocked| BLK[⛔ refuse · log why<br/>🗣️ Piper TTS speaks it on the Pebble]
-    CG -->|allowed| BR[node-sonos-http-api :5005]
+    EGG -->|no| CG{🚫 explicit?<br/>blocklist.py · per track}
+    RC --> XC{🚫 explicit?<br/>collection track-scan}
+
+    CG -->|blocked| BLK
+    CG -->|allowed| BR
+    XC -->|blocked| BLK
+    XC -->|allowed| BR
 
     BR --> SPK([🔊 Sonos speakers · home LAN])
 
-    Q -.-> LOG
-    EC -.-> LOG
+    EC -.-> LOG[(🦆 DuckDB · every request logged)]
     BLK -.-> LOG
-    BR -.-> LOG[(🦆 DuckDB · every request logged)]
+    BR -.-> LOG
     LOG -.->|Parquet snapshot| DASH[📊 Dashboard :8088<br/>FastAPI · never locks the DB]
 
     C -.->|ready meow + LED| J([🐱 audible + LED confirmation])
@@ -69,14 +74,15 @@ flowchart TD
         C
         D
         R
-        COL
         E
         F
         Q
         RES
+        RC
         EGG
         EC
         CG
+        XC
         BLK
         BR
         LOG
