@@ -1,0 +1,15 @@
+[Unit]
+Description=Jukebox: llama.cpp server (intent parsing)
+PartOf=jukebox.target
+
+[Service]
+Type=simple
+User=jetson
+ExecStart=/home/jetson/development/setup/llama_server.sh
+Restart=always
+RestartSec=3
+# Model load + GPU init can take a few seconds; give it room before restart loops.
+TimeoutStartSec=120
+
+[Install]
+WantedBy=jukebox.target

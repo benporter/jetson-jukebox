@@ -1,0 +1,10 @@
+[Unit]
+Description=Jetson Voice Jukebox — all services
+# Components attach via WantedBy=jukebox.target (see each jukebox-*.service).
+# install_services.sh enables every jukebox-*.service it finds, so adding a
+# unit file + re-running the installer is all it takes to boot a new component.
+After=network-online.target
+Wants=network-online.target
+
+[Install]
+WantedBy=multi-user.target

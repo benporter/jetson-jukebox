@@ -1,0 +1,17 @@
+[Unit]
+Description=Jukebox: request dashboard (LAN web UI over the request log)
+PartOf=jukebox.target
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=jetson
+EnvironmentFile=/home/jetson/development/config/jukebox.env
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/home/jetson/development/setup/dashboard_server.sh
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=jukebox.target

@@ -1,0 +1,17 @@
+[Unit]
+Description=Jukebox: readiness gate — meow when all components are up
+PartOf=jukebox.target
+# Start after the components have been launched; the script then waits for them
+# to actually become healthy before meowing.
+After=jukebox-sonos.service jukebox-llm.service jukebox-leds.service
+Wants=jukebox-sonos.service jukebox-llm.service jukebox-leds.service
+
+[Service]
+Type=oneshot
+User=jetson
+SupplementaryGroups=audio
+ExecStart=/home/jetson/development/setup/jukebox_ready.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=jukebox.target

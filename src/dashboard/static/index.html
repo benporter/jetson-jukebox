@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>🐱 Jukebox Dashboard</title>
+<link rel="stylesheet" href="/static/vendor/gridjs-mermaid.min.css">
+<style>
+  :root {
+    --bg:#0f1117; --panel:#171a23; --line:#262b38; --fg:#e6e9ef; --mut:#8a93a6;
+    --accent:#7aa2f7; --ok:#7bd88f; --warn:#e0af68; --bad:#f7768e; --chip:#1f2430;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg);
+    font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif; }
+  header { padding:18px 22px 6px; }
+  h1 { margin:0; font-size:20px; font-weight:700; }
+  .sub { color:var(--mut); font-size:12px; margin-top:2px; }
+  main { padding:14px 22px 40px; }
+
+  .kpis { display:flex; gap:12px; flex-wrap:wrap; margin:12px 0 16px; }
+  .kpi { background:var(--panel); border:1px solid var(--line); border-radius:10px;
+    padding:12px 16px; min-width:120px; }
+  .kpi .n { font-size:24px; font-weight:700; }
+  .kpi .l { color:var(--mut); font-size:11px; text-transform:uppercase;
+    letter-spacing:.04em; }
+  .kpi.ok .n { color:var(--ok); } .kpi.bad .n { color:var(--bad); }
+  .kpi.warn .n { color:var(--warn); }
+
+  .controls { display:flex; gap:14px; flex-wrap:wrap; align-items:center;
+    margin-bottom:14px; }
+  .chips { display:flex; gap:6px; }
+  .chip { background:var(--chip); border:1px solid var(--line); color:var(--fg);
+    padding:6px 12px; border-radius:999px; cursor:pointer; font-size:13px; }
+  .chip.active { background:var(--accent); border-color:var(--accent); color:#0b0e14;
+    font-weight:600; }
+  select, input[type=datetime-local], input[type=search] {
+    background:var(--panel); border:1px solid var(--line); color:var(--fg);
+    border-radius:8px; padding:6px 10px; font-size:13px; }
+  label.f { color:var(--mut); font-size:12px; display:flex; gap:6px;
+    align-items:center; }
+  .grow { flex:1 1 auto; }
+
+  .badge { padding:2px 8px; border-radius:999px; font-size:12px; font-weight:600;
+    display:inline-block; }
+  .b-played { background:rgba(123,216,143,.15); color:var(--ok); }
+  .b-failed { background:rgba(247,118,142,.15); color:var(--bad); }
+  .b-blocked{ background:rgba(224,175,104,.15); color:var(--warn); }
+  .b-other  { background:rgba(138,147,166,.15); color:var(--mut); }
+
+  .gridjs-wrapper, .gridjs-table { background:var(--panel) !important; }
+  /* Horizontal scroll on the table area; keep a desktop-ish min width so the
+     columns don't collapse into tight little boxes on mobile. */
+  .gridjs-wrapper { overflow-x:auto !important; -webkit-overflow-scrolling:touch; }
+  .gridjs-table { min-width:880px; }
+  .gridjs td, .gridjs th { color:var(--fg) !important;
+    border-color:var(--line) !important; background:var(--panel) !important; }
+  /* Wrap long text (track / artist / transcript) so the row grows taller
+     instead of overflowing into the next cell. */
+  .gridjs td { white-space:normal !important; overflow-wrap:anywhere;
+    vertical-align:top; }
+  .gridjs-search input { background:var(--panel); color:var(--fg);
+    border:1px solid var(--line); }
+  .stale { color:var(--warn); }
+
+  .disk { background:var(--panel); border:1px solid var(--line); border-radius:10px;
+    padding:12px 16px; margin-bottom:16px; }
+  .disk .row { display:flex; justify-content:space-between; align-items:baseline;
+    gap:12px; flex-wrap:wrap; }
+  .disk .t { font-size:13px; } .disk .det { color:var(--mut); font-size:12px; }
+  .bar { height:8px; border-radius:6px; background:#2a3040; margin-top:8px;
+    overflow:hidden; }
+  .bar > div { height:100%; background:var(--ok); }
+  .disk.warn .bar > div { background:var(--warn); }
+  .disk.critical .bar > div { background:var(--bad); }
+  .disk.warn { border-color:var(--warn); } .disk.critical { border-color:var(--bad); }
+
+  .tuning { display:flex; gap:16px; flex-wrap:wrap; margin-bottom:16px; }
+  .tcard { background:var(--panel); border:1px solid var(--line); border-radius:10px;
+    padding:10px 14px; min-width:260px; flex:1 1 260px; }
+  .tcard h3 { margin:0 0 6px; font-size:12px; text-transform:uppercase;
+    letter-spacing:.04em; color:var(--mut); }
+  .tcard ol { margin:0; padding-left:20px; }
+  .tcard li { display:flex; justify-content:space-between; gap:10px; }
+  .tcard .n { color:var(--mut); font-variant-numeric:tabular-nums; }
+  .tcard .empty { color:var(--mut); font-size:13px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>🐱 Jukebox Dashboard</h1>
+  <div class="sub" id="meta">loading…</div>
+</header>
+<main>
+  <div class="kpis" id="kpis"></div>
+
+  <div id="disk"></div>
+  <div id="tuning"></div>
+
+  <div class="controls">
+    <div class="chips" id="chips">
+      <button class="chip active" data-status="all">All</button>
+      <button class="chip" data-status="played">Played</button>
+      <button class="chip" data-status="failed">Failed</button>
+      <button class="chip" data-status="blocked">Blocked</button>
+    </div>
+    <label class="f">Range
+      <select id="range">
+        <option value="1">Last 24h</option>
+        <option value="7">Last 7 days</option>
+        <option value="30" selected>Last 30 days</option>
+        <option value="today">Today</option>
+        <option value="all">All time</option>
+      </select>
+    </label>
+    <label class="f">Room
+      <select id="room"><option value="">All rooms</option></select>
+    </label>
+    <span class="grow"></span>
+  </div>
+
+  <div id="table"></div>
+</main>
+
+<script src="/static/vendor/gridjs.umd.js"></script>
+<script src="/static/app.js"></script>
+</body>
+</html>

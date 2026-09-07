@@ -1,0 +1,56 @@
+# Secrets & credentials — never commit
+.env
+config/settings.json
+config/*.local.json
+# Local machine config: real room names + Wi-Fi SSID live here, not in the repo.
+# The committed template is config/jukebox.env.example.
+config/jukebox.env
+!config/jukebox.env.example
+**/credentials*.json
+tools/node-sonos-http-api/settings.json
+config/sonos-cloud.json
+config/sonos-cloud-tokens.json
+config/spotify-user-tokens.json
+
+# Models — large, downloaded separately (live on NVMe)
+models/
+*.gguf
+*.bin
+*.onnx
+
+# Runtime data — the request DB, its WAL, and dashboard snapshots (never commit)
+data/
+*.duckdb
+*.duckdb.wal
+*.wal
+*.parquet
+*.sqlite
+*.sqlite3
+*.db
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# Node (node-sonos-http-api lives under tools/ when cloned)
+node_modules/
+
+# External dependencies cloned locally — reproducible via setup/README.md, not tracked
+tools/node-sonos-http-api/
+tools/reSpeaker_XVF3800_USB_4MIC_ARRAY/
+tools/whisper.cpp/
+tools/llama.cpp/
+
+# OS / editor
+.DS_Store
+*.swp
+
+# Easter-egg clip — user-supplied, copyrighted; never commit
+assets/no_stairway.wav
+
+# Piper TTS — downloaded binary + voice model (recreate via setup/install_piper.sh)
+tools/piper/

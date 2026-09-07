@@ -1,0 +1,13 @@
+# Python runtime dependencies for the jukebox app.
+#
+# Installed for the jetson user (`pip install --user -r requirements.txt`) so the
+# systemd daemon's /usr/bin/python3 imports them from ~/.local. The core pipeline
+# (whisper/llama/Sonos/Spotify) uses only the stdlib + the external CLIs; these
+# are the extras layered on top.
+
+duckdb>=1.0        # request logging -> data/jukebox.duckdb (src/db.py)
+
+# Request dashboard (src/dashboard/, jukebox-dashboard.service). Lean on purpose:
+# one uvicorn worker reading a Parquet snapshot, no pandas. ~70MB resident.
+fastapi>=0.110     # JSON API + static serving
+uvicorn>=0.27      # ASGI server (plain; no uvloop/httptools extras)

@@ -1,0 +1,15 @@
+[Unit]
+Description=Jukebox: ReSpeaker XVF3800 LED ring off (idle = dark)
+PartOf=jukebox.target
+After=multi-user.target
+
+[Service]
+Type=oneshot
+User=jetson
+# Let the USB mic enumerate after boot/replug before talking to it.
+ExecStartPre=/bin/sleep 2
+ExecStart=/home/jetson/development/setup/respeaker_led.sh off
+RemainAfterExit=yes
+
+[Install]
+WantedBy=jukebox.target

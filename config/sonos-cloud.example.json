@@ -1,0 +1,6 @@
+{
+  "_comment": "Sonos Cloud Control API (audiobooks Path 2). Copy this to config/sonos-cloud.json (gitignored), fill in, then: chmod 600 config/sonos-cloud.json. See docs/sonos-cloud-api.md.",
+  "clientId": "YOUR_SONOS_CLIENT_ID",
+  "clientSecret": "YOUR_SONOS_CLIENT_SECRET",
+  "redirectUri": "https://jetson-orin-nano.local/sonos/callback"
+}

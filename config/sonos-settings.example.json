@@ -1,0 +1,8 @@
+{
+  "//": "Template for node-sonos-http-api. Copy to tools/node-sonos-http-api/settings.json and fill in real Spotify keys. The real file is gitignored.",
+  "port": 5005,
+  "spotify": {
+    "clientId": "YOUR_SPOTIFY_CLIENT_ID",
+    "clientSecret": "YOUR_SPOTIFY_CLIENT_SECRET"
+  }
+}

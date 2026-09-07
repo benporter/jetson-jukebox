@@ -1,0 +1,6 @@
+# ReSpeaker XVF3800 USB 4-Mic Array (VID 2886 / PID 001a)
+# 1) Allow non-root control of the device (LED ring, config) via xvf_host, so
+#    the voice app can toggle the "listening" LED without sudo.
+# 2) On (re)plug, (re)run jukebox-leds.service so the ring returns to idle/dark
+#    — covers unplug, move to another room, and plug back in.
+SUBSYSTEM=="usb", ATTR{idVendor}=="2886", ATTR{idProduct}=="001a", MODE="0666", TAG+="uaccess", TAG+="systemd", ENV{SYSTEMD_WANTS}+="jukebox-leds.service"
