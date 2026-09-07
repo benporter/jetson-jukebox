@@ -5,9 +5,9 @@
        alt="The assembled jukebox: a large cat-paw push-to-talk button, the ReSpeaker mic array, and a Creative Pebble speaker built into a LEGO enclosure.">
 </p>
 
-**Problem Statement**: my kids want to pick songs to play on the Sonos speaker, but I don't want hand them my phone.
+**Problem Statement**: my kids want to pick songs to play on the Sonos speaker, but I don't want hand them my phone. They could pick songs with explicit lyrics and read along to learn how to spell these words.
 
-**Solution**: Create a screen-free AI workflow.
+**Solution**: Create a screen-free AI workflow that lets them request songs with voice commands. It only listens when you physically hold down the button, filters out songs with explicit lyrics, and doesn't play songs at night when they should be sleeping.
 
 A **screen-free voice jukebox for kids**, running on an NVIDIA Jetson Orin Nano Super.
 
